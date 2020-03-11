@@ -64,11 +64,11 @@ class BaseHTMLTag:
     def attr2Str(self,k,v):
         # For now we don't do anything with the attr name
         if isinstance(v,int):
-            return "%d" % (v)
+            return "{:d}".format(v)
         elif isinstance(v,str):
-            return "\"%s\"" % (v)
+            return "\"{}\"".format(v)
         else:
-            return "\"%s\"" % (str(v))
+            return "\"{}\"".format(str(v))
 
     # Check if this tag is an empty tag (i.e. no content and no nested tags)
     def isEmptyTag(self):
@@ -78,10 +78,10 @@ class BaseHTMLTag:
     def dumpTag(self,depth=0):
         indent = INDENT_SIZE*depth*int(self.pretty_print)
         # Empty tags don't get indented, might want to change this at some point
-        string = "<%s" % (self.tag_name) if self.isEmptyTag() else "%s<%s" % (indent,self.tag_name)
+        string = "<{tag}".format(tag=self.tag_name) if self.isEmptyTag() else "{}<{tag}".format(indent,tag=self.tag_name)
         for k,v in self.getAttributes().iteritems():
-            string += " %s=%s" % (k,self.attr2Str(k,v))
-        if self.isEmptyTag(): return string+"/>"
+            string += " {key}={val}".format(key=k,val=self.attr2Str(k,v))
+        if self.isEmptyTag(): return "{}/>".format(string)
         string += ">"
         if len(self.getTags()) == 0:
             # For now, only tags with no nested tags can have content
@@ -90,14 +90,14 @@ class BaseHTMLTag:
             if len(lines) > 1 and self.pretty_print:    # Indent content of tags that is multi-line
                 content = "\n"
                 for l in lines:
-                    content += "%s%s\n" % (indent+INDENT_SIZE,l) if len(l) else "\n"
-                content += "%s" % (indent)              # This is so the closing tag gets indented properly
-            string += "%s</%s>\n" % (content,self.tag_name)
+                    content += "{}{line}\n".format(indent+INDENT_SIZE,line=l) if len(l) else "\n"
+                content += "{}".format(indent)              # This is so the closing tag gets indented properly
+            string += "{content}</{tag}>\n".format(content=content,tag=self.tag_name)
             return string
         string += "\n"
         for tag in self.getTags():
             string += tag.dumpTag(depth=depth+1)
-        string += "%s</%s>\n" % (indent,self.tag_name)
+        string += "{}</{tag}>\n".format(indent,tag=self.tag_name)
         return string
 
 class BreakTag(BaseHTMLTag):

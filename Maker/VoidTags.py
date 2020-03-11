@@ -12,9 +12,9 @@ class VoidTag(BaseHTMLTag):
 
     def dumpTag(self,depth=0):
         indent = INDENT_SIZE*depth*int(self.pretty_print)
-        string = "%s<%s" % (indent,self.tag_name)
+        string = "{}<{tag}".format(indent,tag=self.tag_name)
         for k,v in self.getAttributes().iteritems():
-            string += " %s=%s" % (k,self.attr2Str(k,v))
+            string += " {key}={val}".format(key=k,val=self.attr2Str(k,v))
         string += ">\n"
         return string
 
