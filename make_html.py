@@ -1,9 +1,9 @@
 import os
 import sys
 
-from HTMLMaker.BaseTags import *
-from HTMLMaker.VoidTags import *
-from HTMLMaker.HTMLGenerator import HTMLGenerator
+from Maker.BaseTags import *
+from Maker.VoidTags import *
+from Maker.HTMLGenerator import HTMLGenerator
 
 # Create an index.html file for a web-directory with .png files
 
@@ -48,17 +48,21 @@ def getImages(tar_dir,file_type='png'):
 def make_html(tar_dir):
     home_dir = os.getcwd()
     if not os.path.exists(tar_dir):
-        print "Target directory does not exists: %s" % (tar_dir)
+        print "Target directory does not exists: {}".format(tar_dir)
         return
 
     os.chdir(tar_dir)
 
     my_html = HTMLGenerator()
+    
+    meta_tag = MetaTag()
+    style_tag = StyleTag()
 
-    meta_tag = MetaTag(); my_html.addHeadTag(meta_tag)
+    my_html.addHeadTag(meta_tag)
+    my_html.addHeadTag(style_tag)
+    
     meta_tag.addAttributes(charset='UTF-8')
 
-    style_tag = StyleTag(); my_html.addHeadTag(style_tag)
     style_tag.setContent(STYLE_STR)
     style_tag.addAttributes(type='text/css')
 
@@ -66,10 +70,13 @@ def make_html(tar_dir):
     for fname in image_files:
         image_name,ftype = fname.rsplit(".",1)
 
-        div_tag   = DivisionTag(); my_html.addBodyTag(div_tag)
+        div_tag   = DivisionTag()
+        
+        my_html.addBodyTag(div_tag)
+
         image_tag = ImgTag()
         text_div  = DivisionTag()
-        link_tag  = HyperLinkTag(link_location="./%s" % (fname),link_name='')
+        link_tag  = HyperLinkTag(link_location="./{}".format(fname),link_name='')
 
         # This ensures the pretty_print setting gets inherited properly
         div_tag.addTag(link_tag)
@@ -96,6 +103,7 @@ def main():
         fpath = sys.argv[1]
     else:
         print "ERROR: Must specify path"
+        return
     if not os.path.exists(fpath):
         print "ERROR: Unknown path {}".format(fpath)
         return
